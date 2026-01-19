@@ -4,6 +4,8 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 import axios from "axios";
+ 
+import personService from "./services/person.js"
 
 
 const App = () => {
@@ -12,6 +14,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [number, setNumber] = useState('')
   const [term, setTerm] = useState('')
+  console.log(filteredList)
 
   const onSubmit = (e) => {
     e.preventDefault()
@@ -21,10 +24,13 @@ const App = () => {
       alert(`${newName} is already added to phonebook`)
       return
     }
+
     setPersons([...persons, { name: newName, phoneNumber: number }])
     setFilteredList([...persons, { name: newName, phoneNumber: number }])
     setNewName('')
     setNumber('')
+
+    personService.create({ name: newName, phoneNumber: number })  
   }
 
   const handleSearch = (e) => {
@@ -33,12 +39,10 @@ const App = () => {
   }
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").
-      then((res) => {
-        setPersons(res.data)
-        setFilteredList(res.data)
-      }
-    )
+    personService.getAll().then(res => {
+      setFilteredList(res)
+      setPersons(res)
+    })
   }, [])
   return (
     <div>
