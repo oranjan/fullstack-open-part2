@@ -38,12 +38,25 @@ const App = () => {
     setFilteredList(persons.filter(p => p.name.toLowerCase().includes(e.target.value.toLowerCase())))
   }
 
-  useEffect(() => {
+
+  const getAll = () => {
     personService.getAll().then(res => {
       setFilteredList(res)
       setPersons(res)
     })
+  }
+
+  useEffect(() => {
+    getAll()
   }, [])
+
+  const handleDelete = (id) => {
+    const c = confirm("delete")
+   if(!c) return
+    personService.remove(id).then(data => {
+      getAll() 
+    })
+  }
   return (
     <div>
       <h2>Phonebook</h2>
@@ -51,7 +64,7 @@ const App = () => {
       <PersonForm onSubmit={onSubmit} setNewName={setNewName} newName={newName} number={number} setNumber={setNumber} />
       <h3>Add a new</h3>
       <h2>Numbers</h2>
-      <Persons filteredList={filteredList} />
+      <Persons filteredList={filteredList}  onDelete={handleDelete}/>
     </div>
   )
 }
