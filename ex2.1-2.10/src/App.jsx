@@ -14,6 +14,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [number, setNumber] = useState('')
   const [term, setTerm] = useState('')
+  const [errorMsg, setErrorMsg] = useState('')
+  const [successMsg, setSuccessMsg] = useState('')
 
   const getAll = () => {
     personService.getAll().then(res => {
@@ -27,12 +29,30 @@ const App = () => {
     if (!newName || !number) return
     const isDupe = persons.filter(p => p.name === newName)
     if (isDupe.length > 0) {
-      alert(`${newName} is already added to phonebook replace the old number with new one `)
+      if (isDupe[0].phoneNumber === number) {
+        setErrorMsg(`${newName} is already added to phonebook replace the old number with new one `)
+        setTimeout(() => {
+          setErrorMsg(null)
+        }, 5000)
+        return
+      }
       personService.update(isDupe[0].id,
         {
           name: newName,
           phoneNumber: number
-        }).then(data => getAll())
+        })
+        .then(data => {
+          getAll()
+          setSuccessMsg(`${newName}'s number has been updated`)
+          setTimeout(() => {
+            setSuccessMsg(null)
+          }, 5000)
+
+        }
+
+        )
+        .catch(err => {
+        })
       return
     }
 
@@ -41,7 +61,12 @@ const App = () => {
     setNewName('')
     setNumber('')
 
-    personService.create({ name: newName, phoneNumber: number })
+    personService.create({ name: newName, phoneNumber: number }).then(() => {
+      setSuccessMsg(`${newName} is added to phonebook `)
+      setTimeout(() => {
+        setSuccessMsg(null)
+      }, 5000)
+    })
   }
 
   const handleSearch = (e) => {
@@ -62,9 +87,40 @@ const App = () => {
       getAll()
     })
   }
+
+  const errorStyle = {
+    color: 'red',
+    background: 'lightgrey',
+    fontSize: '20px',
+    borderStyle: 'solid',
+    borderRadius: '5px',
+    padding: '10px',
+    marginBottom: '10px'
+  }
+
+
+  const sucessStyle = {
+    color: 'green',
+    background: 'lightgrey',
+    fontSize: '20px',
+    borderStyle: 'solid',
+    borderRadius: '5px',
+    padding: '10px',
+    marginBottom: '10px'
+  }
+
+
   return (
     <div>
       <h2>Phonebook</h2>
+      {
+        errorMsg && <p style={errorStyle}>{errorMsg}</p>
+      }
+
+      {
+        successMsg && <p style={sucessStyle}>{successMsg}</p>
+      }
+
       <Filter term={term} handleSearch={handleSearch} />
       <PersonForm onSubmit={onSubmit} setNewName={setNewName} newName={newName} number={number} setNumber={setNumber} />
       <h3>Add a new</h3>
