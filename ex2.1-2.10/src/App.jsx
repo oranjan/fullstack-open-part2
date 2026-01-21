@@ -3,8 +3,6 @@ import { useEffect, useState } from 'react'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
-import axios from "axios";
-
 import personService from "./services/person.js"
 
 
@@ -30,38 +28,44 @@ const App = () => {
     const isDupe = persons.filter(p => p.name === newName)
     if (isDupe.length > 0) {
       if (isDupe[0].phoneNumber === number) {
-        setErrorMsg(`${newName} is already added to phonebook replace the old number with new one `)
+        setErrorMsg(
+          `${newName} is already added to phonebook replace the old number with new one `,
+        );
         setTimeout(() => {
-          setErrorMsg(null)
-        }, 5000)
-        return
+          setErrorMsg(null);
+        }, 5000);
+        return;
       }
-      personService.update(isDupe[0].id,
-        {
+      personService
+        .update(isDupe[0].id, {
           name: newName,
-          phoneNumber: number
+          phoneNumber: number,
         })
-        .then(data => {
-          getAll()
-          setSuccessMsg(`${newName}'s number has been updated`)
+        .then((data) => {
+          getAll();
+          setSuccessMsg(`${newName}'s number has been updated`);
           setTimeout(() => {
-            setSuccessMsg(null)
-          }, 5000)
-
-        }
-
-        )
-        .catch(err => {
+            setSuccessMsg(null);
+          }, 5000);
         })
-      return
+        .catch(() => {
+          setErrorMsg(
+            `Information of ${newName} has already been removed from server`,
+          );
+          setPersons(persons.filter(p => p.id !== isDupe[0].id));
+          setFilteredList(filteredList.filter(p => p.id !== isDupe[0].id));
+          setTimeout(() => {
+            setErrorMsg(null);
+          }, 5000);
+        });
+      return;
     }
 
-    setPersons([...persons, { name: newName, phoneNumber: number }])
-    setFilteredList([...persons, { name: newName, phoneNumber: number }])
     setNewName('')
     setNumber('')
 
     personService.create({ name: newName, phoneNumber: number }).then(() => {
+      getAll()
       setSuccessMsg(`${newName} is added to phonebook `)
       setTimeout(() => {
         setSuccessMsg(null)
@@ -111,7 +115,8 @@ const App = () => {
 
 
   return (
-    <div>
+    <div style={{
+    }}>
       <h2>Phonebook</h2>
       {
         errorMsg && <p style={errorStyle}>{errorMsg}</p>
