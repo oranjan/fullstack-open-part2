@@ -61,11 +61,10 @@ const App = () => {
       return;
     }
 
-    setNewName('')
-    setNumber('')
-
     personService.create({ name: newName, phoneNumber: number }).then(() => {
       getAll()
+      setNewName('')
+      setNumber('')
       setSuccessMsg(`${newName} is added to phonebook `)
       setTimeout(() => {
         setSuccessMsg(null)
@@ -85,7 +84,8 @@ const App = () => {
   }, [])
 
   const handleDelete = (id) => {
-    const c = confirm("delete")
+    const person = persons.find(p => p.id === id)
+    const c = confirm(`Delete ${person.name}?`)
     if (!c) return
     personService.remove(id).then(data => {
       getAll()
@@ -103,7 +103,7 @@ const App = () => {
   }
 
 
-  const sucessStyle = {
+  const successStyle = {
     color: 'green',
     background: 'lightgrey',
     fontSize: '20px',
@@ -115,20 +115,19 @@ const App = () => {
 
 
   return (
-    <div style={{
-    }}>
+    <div>
       <h2>Phonebook</h2>
       {
         errorMsg && <p style={errorStyle}>{errorMsg}</p>
       }
 
       {
-        successMsg && <p style={sucessStyle}>{successMsg}</p>
+        successMsg && <p style={successStyle}>{successMsg}</p>
       }
 
       <Filter term={term} handleSearch={handleSearch} />
-      <PersonForm onSubmit={onSubmit} setNewName={setNewName} newName={newName} number={number} setNumber={setNumber} />
       <h3>Add a new</h3>
+      <PersonForm onSubmit={onSubmit} setNewName={setNewName} newName={newName} number={number} setNumber={setNumber} />
       <h2>Numbers</h2>
       <Persons filteredList={filteredList} onDelete={handleDelete} />
     </div>

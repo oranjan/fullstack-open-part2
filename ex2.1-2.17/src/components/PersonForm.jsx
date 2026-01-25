@@ -7,7 +7,7 @@ const PersonForm = ({ onSubmit, setNewName, newName, number, setNumber }) => {
             </div>
             <br />
             <div>
-                number: <input type='number' onChange={e => setNumber(e.target.value)} value={number}
+                number: <input type='text' onChange={e => setNumber(e.target.value)} value={number}
                     maxLength={10} minLength={10}
                 />
             </div>
